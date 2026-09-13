@@ -1,42 +1,174 @@
-
 <!DOCTYPE html>
 <html lang="cs">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Počasí Rakovník – 3 modely</title>
+
+<title>Počasí – 3 modely</title>
+
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#eef5fa;margin:0;color:#17324d}
-.wrap{max-width:900px;margin:25px auto;padding:14px}
-.card{background:#fff;border-radius:18px;padding:25px;box-shadow:0 8px 30px #00000012}
-h1{margin:0 0 7px;font-size:28px}
-.sub{color:#64788a;margin-bottom:20px}
-.row{display:flex;gap:10px}
-.row input{flex:1}
-input,button{font-size:16px;border-radius:10px;padding:12px}
-input{border:1px solid #b9c8d4}
-button{border:0;background:#1f6fae;color:#fff;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.6}
-.status{margin:15px 0;color:#64788a}
-.day{border-top:1px solid #e1e8ed;padding:20px 0}
-.day h2{font-size:20px;margin:0 0 14px;text-transform:capitalize}
-.models{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.model{border:1px solid #dbe5eb;border-radius:12px;padding:13px}
-.model strong{display:block;margin-bottom:7px}
-.temp{font-size:22px;font-weight:bold}
-.details{color:#526879;margin-top:7px;line-height:1.55}
-.result{margin-top:20px;background:#f3f8fb;border-radius:12px;padding:18px;font-size:17px;line-height:1.5}
-.agreement{margin-top:10px;padding:12px;border-radius:10px;background:#eef7ef}
-.sources{font-size:12px;color:#718391;margin-top:18px;line-height:1.55}
-@media(max-width:700px){.models{grid-template-columns:1fr}.row{flex-direction:column}}
+
+body{
+  font-family:Arial,sans-serif;
+  background:#eef5fa;
+  margin:0;
+  color:#17324d
+}
+
+.wrap{
+  max-width:900px;
+  margin:25px auto;
+  padding:14px
+}
+
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 8px 30px #00000012
+}
+
+h1{
+  margin:0 0 7px;
+  font-size:28px
+}
+
+.sub{
+  color:#64788a;
+  margin-bottom:20px
+}
+
+.row{
+  display:flex;
+  gap:10px
+}
+
+.row input{
+  flex:1
+}
+
+input,button{
+  font-size:16px;
+  border-radius:10px;
+  padding:12px
+}
+
+input{
+  border:1px solid #b9c8d4
+}
+
+button{
+  border:0;
+  background:#1f6fae;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer
+}
+
+button:disabled{
+  opacity:.6
+}
+
+.status{
+  margin:15px 0;
+  color:#64788a
+}
+
+.day{
+  border-top:1px solid #e1e8ed;
+  padding:20px 0
+}
+
+.day h2{
+  font-size:20px;
+  margin:0 0 14px;
+  text-transform:capitalize
+}
+
+.models{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px
+}
+
+.model{
+  border:1px solid #dbe5eb;
+  border-radius:12px;
+  padding:13px
+}
+
+.model strong{
+  display:block;
+  margin-bottom:7px
+}
+
+.temp{
+  font-size:22px;
+  font-weight:bold
+}
+
+.details{
+  color:#526879;
+  margin-top:7px;
+  line-height:1.55
+}
+
+.result{
+  margin-top:20px;
+  background:#f3f8fb;
+  border-radius:12px;
+  padding:18px;
+  font-size:17px;
+  line-height:1.5
+}
+
+.agreement{
+  margin-top:10px;
+  padding:12px;
+  border-radius:10px;
+  background:#eef7ef
+}
+
+.sources{
+  font-size:12px;
+  color:#718391;
+  margin-top:18px;
+  line-height:1.55
+}
+
+.error{
+  background:#fff1f1;
+  border:1px solid #e6bcbc;
+  color:#9a3030;
+  padding:14px;
+  border-radius:10px;
+  margin-top:15px
+}
+
+@media(max-width:700px){
+  .models{
+    grid-template-columns:1fr
+  }
+
+  .row{
+    flex-direction:column
+  }
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
 <div class="card">
+
 <h1>🌤️ Počasí – Rakovník</h1>
-<div class="sub">Porovnání tří skutečných numerických modelů: ČHMÚ ALADIN 1 km, ECMWF IFS a DWD ICON.</div>
+
+<div class="sub">
+Porovnání tří skutečných numerických modelů:
+ČHMÚ ALADIN 1 km, ECMWF IFS HRES 9 km a DWD ICON D2.
+</div>
 
 <div class="row">
 <input id="city" value="Rakovník" placeholder="Město nebo obec">
@@ -47,164 +179,708 @@ button:disabled{opacity:.6}
 <div id="output"></div>
 
 <div class="sources">
-<strong>Modely:</strong><br>
-🇨🇿 <strong>ČHMÚ ALADIN CZ 1 km</strong> – český regionální model, hodinová data, horizont 3 dny, aktualizace každých 6 hodin.<br>
-🇪🇺 <strong>ECMWF IFS HRES 9 km</strong> – globální model ECMWF, aktualizace 4× denně.<br>
-🇩🇪 <strong>DWD ICON D2</strong> – regionální model DWD pro střední Evropu, přibližně 2 km, aktualizace každé 3 hodiny.<br><br>
-Výsledný text vzniká porovnáním všech tří modelů. Data jsou načítána při otevření/obnovení aplikace.
+
+<strong>Použité modely:</strong><br>
+
+🇨🇿 <strong>ČHMÚ ALADIN CZ 1 km</strong> –
+český regionální model, hodinová data, horizont přibližně 3 dny,
+aktualizace každých 6 hodin.<br>
+
+🇪🇺 <strong>ECMWF IFS HRES 9 km</strong> –
+globální model ECMWF, horizont až 10 dní,
+aktualizace přibližně 4× denně.<br>
+
+🇩🇪 <strong>DWD ICON D2</strong> –
+regionální model DWD pro střední Evropu,
+přibližně 2 km, aktualizace každé 3 hodiny.<br>
+
+<br>
+
+Výsledný text vzniká porovnáním všech tří modelů.
+Data jsou načítána při otevření nebo obnovení aplikace.
+
 </div>
+
 </div>
 </div>
 
 <script>
-const $=id=>document.getElementById(id);
+
+const $ = id => document.getElementById(id);
+
+
+/* ---------------------------------------------------------
+   FORMÁTOVÁNÍ
+--------------------------------------------------------- */
 
 function fmtDate(s){
-  return new Date(s+"T12:00:00").toLocaleDateString("cs-CZ",{weekday:"long",day:"numeric",month:"numeric"});
+  return new Date(s+"T12:00:00").toLocaleDateString(
+    "cs-CZ",
+    {
+      weekday:"long",
+      day:"numeric",
+      month:"numeric"
+    }
+  );
 }
+
 
 function avg(a){
   const b=a.filter(x=>Number.isFinite(x));
-  return b.length?b.reduce((x,y)=>x+y,0)/b.length:null;
+
+  return b.length
+    ? b.reduce((x,y)=>x+y,0)/b.length
+    : null;
 }
+
+
 function max(a){
   const b=a.filter(x=>Number.isFinite(x));
-  return b.length?Math.max(...b):null;
+
+  return b.length
+    ? Math.max(...b)
+    : null;
 }
+
+
 function min(a){
   const b=a.filter(x=>Number.isFinite(x));
-  return b.length?Math.min(...b):null;
+
+  return b.length
+    ? Math.min(...b)
+    : null;
 }
-function r(x){return x==null?"—":Math.round(x)}
-function f(x){return x==null?"—":x.toFixed(1)}
+
+
+function r(x){
+  return x==null ? "—" : Math.round(x);
+}
+
+
+function f(x){
+  return x==null ? "—" : x.toFixed(1);
+}
+
+
+/* ---------------------------------------------------------
+   POČASÍ – WMO KÓDY
+--------------------------------------------------------- */
 
 const weatherText={
-0:["☀️","Jasno"],1:["🌤️","Převážně jasno"],2:["⛅","Polojasno"],3:["☁️","Oblačno"],
-45:["🌫️","Mlha"],48:["🌫️","Mlha s námrazou"],51:["🌦️","Slabé mrholení"],
-53:["🌦️","Mrholení"],55:["🌧️","Silné mrholení"],61:["🌦️","Slabý déšť"],
-63:["🌧️","Déšť"],65:["🌧️","Silný déšť"],71:["🌨️","Slabé sněžení"],
-73:["🌨️","Sněžení"],75:["❄️","Silné sněžení"],80:["🌦️","Přeháňky"],
-81:["🌧️","Přeháňky"],82:["⛈️","Silné přeháňky"],95:["⛈️","Bouřky"],
-96:["⛈️","Bouřky s kroupami"],99:["⛈️","Silné bouřky"]
+
+0:["☀️","Jasno"],
+1:["🌤️","Převážně jasno"],
+2:["⛅","Polojasno"],
+3:["☁️","Oblačno"],
+
+45:["🌫️","Mlha"],
+48:["🌫️","Mlha s námrazou"],
+
+51:["🌦️","Slabé mrholení"],
+53:["🌦️","Mrholení"],
+55:["🌧️","Silné mrholení"],
+
+61:["🌦️","Slabý déšť"],
+63:["🌧️","Déšť"],
+65:["🌧️","Silný déšť"],
+
+71:["🌨️","Slabé sněžení"],
+73:["🌨️","Sněžení"],
+75:["❄️","Silné sněžení"],
+
+80:["🌦️","Přeháňky"],
+81:["🌧️","Přeháňky"],
+82:["⛈️","Silné přeháňky"],
+
+95:["⛈️","Bouřky"],
+96:["⛈️","Bouřky s kroupami"],
+99:["⛈️","Silné bouřky"]
+
 };
-function desc(c){return weatherText[c]||["🌡️","Proměnlivé počasí"];}
 
-async function getJSON(url){
-  const response=await fetch(url);
-  if(!response.ok) throw new Error("HTTP "+response.status);
-  return response.json();
+
+function desc(c){
+  return weatherText[c] || ["🌡️","Proměnlivé počasí"];
 }
 
-async function geocode(q){
-  const url=`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=cs&format=json`;
-  const j=await getJSON(url);
-  if(!j.results?.length) throw new Error("Místo nebylo nalezeno.");
-  return j.results[0];
-}
 
-function dailyFromHourly(j, days){
-  const h=j.hourly;
-  const out={};
-  for(let i=0;i<h.time.length;i++){
-    const d=h.time[i].slice(0,10);
-    if(!out[d]) out[d]={temps:[],prec:[],wind:[],codes:[]};
-    if(Number.isFinite(h.temperature_2m?.[i])) out[d].temps.push(h.temperature_2m[i]);
-    if(Number.isFinite(h.precipitation?.[i])) out[d].prec.push(h.precipitation[i]);
-    if(Number.isFinite(h.wind_speed_10m?.[i])) out[d].wind.push(h.wind_speed_10m[i]);
-    if(Number.isFinite(h.weather_code?.[i])) out[d].codes.push(h.weather_code[i]);
-  }
-  return days.map(d=>{
-    const x=out[d]||{temps:[],prec:[],wind:[],codes:[]};
-    const code=x.codes.length?x.codes[Math.floor(x.codes.length/2)]:null;
-    return {
-      min:min(x.temps), max:max(x.temps),
-      rain:x.prec.reduce((a,b)=>a+b,0),
-      wind:max(x.wind), code
-    };
-  });
-}
+/* ---------------------------------------------------------
+   API
+--------------------------------------------------------- */
 
-async function loadWeather(){
-  const q=$("city").value.trim()||"Rakovník";
-  $("go").disabled=true;
-  $("status").textContent="Načítám tři meteorologické modely…";
-  $("output").innerHTML="";
+async function getJSON(url,name){
 
   try{
-    const p=await geocode(q);
-    const lat=p.latitude, lon=p.longitude;
-    const common=`latitude=${lat}&longitude=${lon}&timezone=Europe%2FPrague&forecast_days=3&hourly=temperature_2m,precipitation,wind_speed_10m,weather_code`;
 
-    const [chmi,ecmwf,icon]=await Promise.all([
-      getJSON(`https://api.open-meteo.com/v1/chmi?${common}`),
-      getJSON(`https://api.open-meteo.com/v1/ecmwf?${common}`),
-      getJSON(`https://api.open-meteo.com/v1/dwd-icon?${common}`)
-    ]);
+    const response=await fetch(url);
 
-    const days=chmi.hourly.time.map(x=>x.slice(0,10)).filter((x,i,a)=>a.indexOf(x)===i).slice(0,3);
-    const A=dailyFromHourly(chmi,days);
-    const E=dailyFromHourly(ecmwf,days);
-    const I=dailyFromHourly(icon,days);
+    if(!response.ok){
 
-    let html=`<div class="status"><strong>${p.name}</strong>${p.admin1?", "+p.admin1:""} · ${p.country||""}<br><small>Načteny 3 samostatné modely pro stejné souřadnice.</small></div>`;
+      throw new Error(
+        name+" – HTTP "+response.status
+      );
 
-    days.forEach((d,i)=>{
-      const vals=[A[i],E[i],I[i]];
-      const tmax=avg(vals.map(x=>x.max));
-      const tmin=avg(vals.map(x=>x.min));
-      const rain=avg(vals.map(x=>x.rain));
-      const wind=avg(vals.map(x=>x.wind));
+    }
 
-      const codes=vals.map(x=>x.code).filter(Number.isFinite);
-      const code=codes.length?codes.sort((a,b)=>a-b)[Math.floor(codes.length/2)]:null;
-      const wx=desc(code);
+    const data=await response.json();
 
-      const spread=Math.max(...vals.map(x=>x.max).filter(Number.isFinite))-Math.min(...vals.map(x=>x.max).filter(Number.isFinite));
-      const agreement=spread<=2?"Modely se na teplotě dobře shodují.":spread<=4?"Modely mají mírný rozdíl.":"Modely se v teplotě výrazněji rozcházejí.";
+    if(data.error){
 
-      html+=`<div class="day">
-        <h2>${fmtDate(d)}</h2>
-        <div class="models">
-          ${modelCard("🇨🇿 ČHMÚ ALADIN 1 km",A[i])}
-          ${modelCard("🇪🇺 ECMWF IFS HRES",E[i])}
-          ${modelCard("🇩🇪 DWD ICON D2",I[i])}
-        </div>
-        <div class="result">
-          <strong>Společný výsledek:</strong> ${wx[0]} ${wx[1]} · přibližně
-          <strong>${r(tmin)} až ${r(tmax)} °C</strong> · srážky kolem
-          <strong>${f(rain)} mm</strong> · vítr kolem <strong>${r(wind)} km/h</strong>.
-          <div class="agreement">📊 ${agreement}</div>
-        </div>
-      </div>`;
-    });
+      throw new Error(
+        name+" – "+(data.reason || "API chyba")
+      );
 
-    html+=`<div class="result"><strong>Jak aplikace rozhoduje:</strong>
-    Nevybírá slepě jeden model. Zobrazuje každý model zvlášť a pod nimi uvádí
-    společný průměr a míru shody. Pokud se modely výrazně rozcházejí, aplikace to oznámí.</div>`;
+    }
 
-    $("output").innerHTML=html;
-    $("status").textContent="Aktuální předpověď načtena.";
+    return data;
+
   }catch(e){
-    $("status").textContent="Chyba při načítání: "+e.message;
-  }finally{
-    $("go").disabled=false;
+
+    throw new Error(
+      e.message || (name+" – chyba připojení")
+    );
+
   }
+
 }
+
+
+/* ---------------------------------------------------------
+   GEOCODING
+--------------------------------------------------------- */
+
+async function geocode(q){
+
+  const url =
+    `https://geocoding-api.open-meteo.com/v1/search`+
+    `?name=${encodeURIComponent(q)}`+
+    `&count=1`+
+    `&language=cs`+
+    `&format=json`;
+
+  const j=await getJSON(url,"Geokódování");
+
+  if(!j.results?.length){
+
+    throw new Error(
+      "Místo nebylo nalezeno."
+    );
+
+  }
+
+  return j.results[0];
+
+}
+
+
+/* ---------------------------------------------------------
+   PŘEVOD HOURLY → DENNÍ HODNOTY
+--------------------------------------------------------- */
+
+function dailyFromHourly(j,days){
+
+  const h=j.hourly;
+  const out={};
+
+  for(let i=0;i<h.time.length;i++){
+
+    const d=h.time[i].slice(0,10);
+
+    if(!out[d]){
+
+      out[d]={
+        temps:[],
+        prec:[],
+        wind:[],
+        codes:[]
+      };
+
+    }
+
+    if(Number.isFinite(h.temperature_2m?.[i]))
+      out[d].temps.push(h.temperature_2m[i]);
+
+    if(Number.isFinite(h.precipitation?.[i]))
+      out[d].prec.push(h.precipitation[i]);
+
+    if(Number.isFinite(h.wind_speed_10m?.[i]))
+      out[d].wind.push(h.wind_speed_10m[i]);
+
+    if(Number.isFinite(h.weather_code?.[i]))
+      out[d].codes.push(h.weather_code[i]);
+
+  }
+
+
+  return days.map(d=>{
+
+    const x =
+      out[d] ||
+      {
+        temps:[],
+        prec:[],
+        wind:[],
+        codes:[]
+      };
+
+
+    const code =
+      x.codes.length
+      ? x.codes[Math.floor(x.codes.length/2)]
+      : null;
+
+
+    return {
+
+      min:min(x.temps),
+
+      max:max(x.temps),
+
+      rain:x.prec.reduce(
+        (a,b)=>a+b,
+        0
+      ),
+
+      wind:max(x.wind),
+
+      code:code
+
+    };
+
+  });
+
+}
+
+
+/* ---------------------------------------------------------
+   MODEL CARD
+--------------------------------------------------------- */
 
 function modelCard(name,x){
+
   const wx=desc(x.code);
-  return `<div class="model">
+
+  return `
+  <div class="model">
+
     <strong>${name}</strong>
-    <div class="temp">${r(x.min)} až ${r(x.max)} °C</div>
-    <div>${wx[0]} ${wx[1]}</div>
-    <div class="details">
-      Srážky: ${f(x.rain)} mm<br>
-      Vítr max.: ${r(x.wind)} km/h
+
+    <div class="temp">
+      ${r(x.min)} až ${r(x.max)} °C
     </div>
-  </div>`;
+
+    <div>
+      ${wx[0]} ${wx[1]}
+    </div>
+
+    <div class="details">
+
+      Srážky:
+      ${f(x.rain)} mm<br>
+
+      Vítr max.:
+      ${r(x.wind)} km/h
+
+    </div>
+
+  </div>
+  `;
+
 }
 
+
+/* ---------------------------------------------------------
+   HLAVNÍ FUNKCE
+--------------------------------------------------------- */
+
+async function loadWeather(){
+
+  const q =
+    $("city").value.trim() ||
+    "Rakovník";
+
+
+  $("go").disabled=true;
+
+  $("status").textContent =
+    "Načítám tři meteorologické modely…";
+
+  $("output").innerHTML="";
+
+
+  try{
+
+    /* ---------------------------------------------
+       1. GEOKÓDOVÁNÍ
+    --------------------------------------------- */
+
+    const p=await geocode(q);
+
+    const lat=p.latitude;
+    const lon=p.longitude;
+
+
+    /* ---------------------------------------------
+       2. SPOLEČNÉ PARAMETRY
+    --------------------------------------------- */
+
+    const common =
+      `latitude=${lat}`+
+      `&longitude=${lon}`+
+      `&timezone=Europe%2FPrague`+
+      `&forecast_days=3`+
+      `&hourly=temperature_2m,precipitation,wind_speed_10m,weather_code`;
+
+
+    /* ---------------------------------------------
+       3. TŘI SAMOSTATNÉ MODELY
+
+       DŮLEŽITÉ:
+       Všechny používají /v1/forecast.
+
+       Model se určuje parametrem models=...
+    --------------------------------------------- */
+
+    const [chmi,ecmwf,icon] =
+      await Promise.all([
+
+        getJSON(
+          `https://api.open-meteo.com/v1/forecast?`+
+          `${common}&models=chmi_aladin_cz_1km`,
+          "ČHMÚ ALADIN CZ 1 km"
+        ),
+
+        getJSON(
+          `https://api.open-meteo.com/v1/forecast?`+
+          `${common}&models=ecmwf_ifs`,
+          "ECMWF IFS HRES 9 km"
+        ),
+
+        getJSON(
+          `https://api.open-meteo.com/v1/forecast?`+
+          `${common}&models=icon_d2`,
+          "DWD ICON D2"
+        )
+
+      ]);
+
+
+    /* ---------------------------------------------
+       4. DATA
+    --------------------------------------------- */
+
+    const days =
+      chmi.hourly.time
+      .map(x=>x.slice(0,10))
+      .filter(
+        (x,i,a)=>a.indexOf(x)===i
+      )
+      .slice(0,3);
+
+
+    const A=dailyFromHourly(
+      chmi,
+      days
+    );
+
+    const E=dailyFromHourly(
+      ecmwf,
+      days
+    );
+
+    const I=dailyFromHourly(
+      icon,
+      days
+    );
+
+
+    /* ---------------------------------------------
+       5. HLAVIČKA
+    --------------------------------------------- */
+
+    let html=`
+
+      <div class="status">
+
+        <strong>
+          ${p.name}
+        </strong>
+
+        ${p.admin1
+          ? ", "+p.admin1
+          : ""
+        }
+
+        · ${p.country || ""}
+
+        <br>
+
+        <small>
+          Načteny 3 samostatné meteorologické
+          modely pro stejné souřadnice.
+        </small>
+
+      </div>
+
+    `;
+
+
+    /* ---------------------------------------------
+       6. JEDNOTLIVÉ DNY
+    --------------------------------------------- */
+
+    days.forEach((d,i)=>{
+
+      const vals=[
+        A[i],
+        E[i],
+        I[i]
+      ];
+
+
+      const tmax=
+        avg(
+          vals.map(x=>x.max)
+        );
+
+
+      const tmin=
+        avg(
+          vals.map(x=>x.min)
+        );
+
+
+      const rain=
+        avg(
+          vals.map(x=>x.rain)
+        );
+
+
+      const wind=
+        avg(
+          vals.map(x=>x.wind)
+        );
+
+
+      /* -----------------------------------------
+         KÓD POČASÍ
+      ----------------------------------------- */
+
+      const codes=
+        vals
+        .map(x=>x.code)
+        .filter(Number.isFinite);
+
+
+      const code=
+        codes.length
+        ? codes.sort(
+            (a,b)=>a-b
+          )[Math.floor(codes.length/2)]
+        : null;
+
+
+      const wx=desc(code);
+
+
+      /* -----------------------------------------
+         ROZPTYL TEPLOT
+      ----------------------------------------- */
+
+      const validMax=
+        vals
+        .map(x=>x.max)
+        .filter(Number.isFinite);
+
+
+      let spread=0;
+
+      if(validMax.length){
+
+        spread=
+          Math.max(...validMax)-
+          Math.min(...validMax);
+
+      }
+
+
+      let agreement;
+
+
+      if(spread<=2){
+
+        agreement=
+          "Modely se na teplotě dobře shodují.";
+
+      }
+      else if(spread<=4){
+
+        agreement=
+          "Modely mají mírný rozdíl.";
+
+      }
+      else{
+
+        agreement=
+          "Modely se v teplotě výrazněji rozcházejí.";
+
+      }
+
+
+      /* -----------------------------------------
+         HTML
+      ----------------------------------------- */
+
+      html+=`
+
+      <div class="day">
+
+        <h2>
+          ${fmtDate(d)}
+        </h2>
+
+        <div class="models">
+
+          ${modelCard(
+            "🇨🇿 ČHMÚ ALADIN 1 km",
+            A[i]
+          )}
+
+          ${modelCard(
+            "🇪🇺 ECMWF IFS HRES",
+            E[i]
+          )}
+
+          ${modelCard(
+            "🇩🇪 DWD ICON D2",
+            I[i]
+          )}
+
+        </div>
+
+
+        <div class="result">
+
+          <strong>
+            Společný výsledek:
+          </strong>
+
+          ${wx[0]}
+          ${wx[1]}
+
+          · přibližně
+
+          <strong>
+            ${r(tmin)}
+            až
+            ${r(tmax)}
+            °C
+          </strong>
+
+          · srážky kolem
+
+          <strong>
+            ${f(rain)}
+            mm
+          </strong>
+
+          · vítr kolem
+
+          <strong>
+            ${r(wind)}
+            km/h
+          </strong>
+
+
+          <div class="agreement">
+
+            📊 ${agreement}
+
+          </div>
+
+        </div>
+
+      </div>
+
+      `;
+
+    });
+
+
+    /* ---------------------------------------------
+       7. VYSVĚTLENÍ
+    --------------------------------------------- */
+
+    html+=`
+
+      <div class="result">
+
+        <strong>
+          Jak aplikace rozhoduje:
+        </strong>
+
+        <br>
+
+        Nevybírá slepě jeden model.
+        Zobrazuje každý model zvlášť a pod nimi
+        uvádí společný průměr.
+
+        Pokud se modely výrazně rozcházejí,
+        aplikace to oznámí.
+
+      </div>
+
+    `;
+
+
+    $("output").innerHTML=html;
+
+    $("status").textContent=
+      "Aktuální předpověď načtena.";
+
+
+  }catch(e){
+
+    $("status").textContent=
+      "Nepodařilo se načíst předpověď.";
+
+    $("output").innerHTML=`
+
+      <div class="error">
+
+        <strong>
+          Chyba při načítání
+        </strong>
+
+        <br><br>
+
+        ${e.message}
+
+        <br><br>
+
+        Zkontrolujte připojení k internetu
+        nebo zkuste vyhledávání znovu.
+
+      </div>
+
+    `;
+
+  }finally{
+
+    $("go").disabled=false;
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   AUTOMATICKÉ NAČTENÍ
+--------------------------------------------------------- */
+
 loadWeather();
+
 </script>
+
 </body>
 </html>

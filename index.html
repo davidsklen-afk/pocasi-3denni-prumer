@@ -1,86 +1,24 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Počasí – 3denní průměr</title>
+<!doctype html><html lang="cs"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1976b8"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png">
+<title>Počasí – Rakovník</title>
 <style>
-*{box-sizing:border-box} body{font-family:Arial,sans-serif;background:#eef5fa;margin:0;color:#17324d}
-.wrap{max-width:820px;margin:30px auto;padding:16px}.card{background:#fff;border-radius:18px;padding:26px;box-shadow:0 8px 30px #00000012}
-h1{margin:0 0 7px;font-size:28px}.sub{color:#64788a;margin-bottom:22px}
-.row{display:flex;gap:10px}.row input{flex:1} input,button{font-size:16px;border-radius:10px;padding:12px} input{border:1px solid #b9c8d4}button{border:0;background:#1f6fae;color:#fff;font-weight:bold;cursor:pointer}button:disabled{opacity:.6}
-.status{margin:16px 0;color:#64788a}.day{border-top:1px solid #e1e8ed;padding:18px 0}.dayhead{display:flex;justify-content:space-between;align-items:center}.temp{font-size:25px;font-weight:bold}.details{color:#526879;margin-top:7px}.result{margin-top:20px;background:#f3f8fb;border-radius:12px;padding:18px;font-size:18px}.sources{font-size:12px;color:#718391;margin-top:18px;line-height:1.5}
-@media(max-width:600px){.row{flex-direction:column}.dayhead{gap:10px;align-items:flex-start}}
-</style>
-</head>
-<body>
-<div class="wrap"><div class="card">
-<h1>🌤️ Počasí – 3denní průměr</h1>
-<div class="sub">Porovnání více meteorologických modelů a jednoduchý výsledný text.</div>
-<div class="row">
-<input id="city" value="Rakovník" placeholder="Město nebo obec">
-<button id="go" onclick="loadWeather()">VYHLEDAT</button>
-</div>
-<div id="status" class="status"></div><div id="output"></div>
-<div class="sources">Data: Open-Meteo Forecast API a ECMWF IFS. Open-Meteo poskytuje bezplatné API pro nekomerční použití a kombinuje data meteorologických modelů národních meteorologických služeb. citeturn0search0turn0search2</div>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#eef5fa;color:#17324d}.wrap{max-width:820px;margin:auto;padding:12px}.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 8px 30px #0001}h1{margin:0 0 6px}.sub,.status,.models{color:#64788a}.search{display:flex;gap:8px}input,button{font-size:16px;padding:13px;border-radius:11px}input{flex:1;border:1px solid #b9c8d4}button{border:0;background:#1976b8;color:white;font-weight:bold}.day{border-top:1px solid #e1e8ed;padding:17px 0}.head{display:flex;justify-content:space-between}.temp{font-size:25px;font-weight:bold}.weather{font-size:18px;margin-top:7px}.details{font-size:14px;color:#526879;margin-top:7px}.result{margin-top:18px;background:#f3f8fb;padding:17px;border-radius:13px;font-size:18px;line-height:1.45}.install{display:none;width:100%;margin-top:10px}@media(max-width:600px){.search{flex-direction:column}}
+</style></head><body><div class="wrap"><div class="card">
+<h1>🌤️ Počasí – 3denní průměr</h1><div class="sub">Výchozí místo: Rakovník · více meteorologických modelů</div>
+<div class="search"><input id="city" value="Rakovník" placeholder="Město nebo obec"><button id="go">VYHLEDAT</button></div>
+<button id="install" class="install">📱 Přidat aplikaci na plochu</button><div id="status" class="status">Načítám…</div><div id="output"></div>
+<div class="models">Data: Open-Meteo · modely podle dostupnosti ECMWF, ICON, GFS a Météo-France.</div>
 </div></div>
-
 <script>
-const $=id=>document.getElementById(id);
-const weatherText={
-0:["☀️","Jasno"],1:["🌤️","Převážně jasno"],2:["⛅","Polojasno"],3:["☁️","Oblačno"],
-45:["🌫️","Mlha"],48:["🌫️","Námraza a mlha"],51:["🌦️","Slabé mrholení"],53:["🌦️","Mrholení"],55:["🌧️","Silné mrholení"],
-61:["🌦️","Slabý déšť"],63:["🌧️","Déšť"],65:["🌧️","Silný déšť"],71:["🌨️","Slabé sněžení"],73:["🌨️","Sněžení"],75:["❄️","Silné sněžení"],
-80:["🌦️","Slabé přeháňky"],81:["🌧️","Přeháňky"],82:["⛈️","Silné přeháňky"],95:["⛈️","Bouřky"],96:["⛈️","Bouřky s kroupami"],99:["⛈️","Silné bouřky"]
-};
-function desc(code){return weatherText[code]||["🌡️","Proměnlivé počasí"]}
-function avg(a){a=a.filter(x=>Number.isFinite(x));return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
-function round(x){return x==null?"—":Math.round(x)}
-function fmtDate(s){return new Date(s+"T12:00:00").toLocaleDateString("cs-CZ",{weekday:"long",day:"numeric",month:"numeric"})}
-
-async function geocode(q){
- const u=`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=cs&format=json`;
- const r=await fetch(u); if(!r.ok) throw Error("Geokódování selhalo");
- const j=await r.json(); if(!j.results?.length) throw Error("Místo nebylo nalezeno.");
- return j.results[0];
-}
-async function forecast(url){const r=await fetch(url);if(!r.ok)throw Error("Předpověď není dostupná");return r.json()}
-
-async function loadWeather(){
- const q=$("city").value.trim(); if(!q)return;
- $("go").disabled=true;$("status").textContent="Načítám polohu a předpovědi…";$("output").innerHTML="";
- try{
-  const p=await geocode(q), lat=p.latitude,lon=p.longitude,tz=p.timezone||"Europe/Prague";
-  const common=`latitude=${lat}&longitude=${lon}&timezone=${encodeURIComponent(tz)}&forecast_days=4&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max`;
-  const [best,ecmwf]=await Promise.all([
-   forecast(`https://api.open-meteo.com/v1/forecast?${common}`),
-   forecast(`https://api.open-meteo.com/v1/ecmwf?${common}`)
-  ]);
-  const days=best.daily.time.slice(1,4);
-  let html=`<div class="status"><strong>${p.name}</strong>${p.admin1?", "+p.admin1:""} · ${p.country||""}</div>`;
-  const summaries=[];
-  days.forEach((date,i)=>{
-    const vals={
-      tmax:avg([best.daily.temperature_2m_max[i+1],ecmwf.daily.temperature_2m_max[i+1]]),
-      tmin:avg([best.daily.temperature_2m_min[i+1],ecmwf.daily.temperature_2m_min[i+1]]),
-      rain:avg([best.daily.precipitation_probability_max[i+1],ecmwf.daily.precipitation_probability_max[i+1]]),
-      mm:avg([best.daily.precipitation_sum[i+1],ecmwf.daily.precipitation_sum[i+1]]),
-      wind:avg([best.daily.wind_speed_10m_max[i+1],ecmwf.daily.wind_speed_10m_max[i+1]])
-    };
-    const code=best.daily.weather_code[i+1], d=desc(code);
-    summaries.push({date, tmax:vals.tmax,tmin:vals.tmin,rain:vals.rain,mm:vals.mm,wind:vals.wind,text:d[1]});
-    html+=`<div class="day"><div class="dayhead"><strong>${fmtDate(date)}</strong><span class="temp">${round(vals.tmax)} °C</span></div>
-      <div>${d[0]} <strong>${d[1]}</strong></div>
-      <div class="details">Minimum ${round(vals.tmin)} °C · pravděpodobnost srážek ${round(vals.rain)} % · srážky ${vals.mm==null?"—":vals.mm.toFixed(1)} mm · vítr až ${round(vals.wind)} km/h</div></div>`;
-  });
-  const avgT=avg(summaries.map(x=>(x.tmax+x.tmin)/2)), avgRain=avg(summaries.map(x=>x.rain));
-  const wet=summaries.filter(x=>x.rain>=50).length;
-  const character=wet>=2?"s častějšími srážkami":wet===1?"místy se srážkami":"většinou bez výraznějších srážek";
-  html+=`<div class="result"><strong>Výsledek:</strong> V následujících třech dnech bude v ${p.name} ${character}, s průměrnou teplotou kolem ${round(avgT)} °C.</div>`;
-  $("output").innerHTML=html;$("status").textContent="Předpověď načtena.";
- }catch(e){$("status").textContent="Chyba: "+e.message}
- finally{$("go").disabled=false}
-}
-loadWeather();
-</script>
-</body></html>
+const $=x=>document.getElementById(x),W={0:["☀️","Jasno"],1:["🌤️","Převážně jasno"],2:["⛅","Polojasno"],3:["☁️","Oblačno"],45:["🌫️","Mlha"],48:["🌫️","Mlha s námrazou"],51:["🌦️","Slabé mrholení"],53:["🌦️","Mrholení"],55:["🌧️","Silné mrholení"],61:["🌦️","Slabý déšť"],63:["🌧️","Déšť"],65:["🌧️","Silný déšť"],71:["🌨️","Slabé sněžení"],73:["🌨️","Sněžení"],75:["❄️","Silné sněžení"],80:["🌦️","Slabé přeháňky"],81:["🌧️","Přeháňky"],82:["⛈️","Silné přeháňky"],95:["⛈️","Bouřky"],96:["⛈️","Bouřky s kroupami"],99:["⛈️","Silné bouřky"]};
+const mean=a=>{a=a.filter(Number.isFinite);return a.length?a.reduce((x,y)=>x+y,0)/a.length:null},r=x=>x==null?"—":Math.round(x),D=s=>new Date(s+"T12:00:00").toLocaleDateString("cs-CZ",{weekday:"long",day:"numeric",month:"numeric"});
+async function j(u){let x=await fetch(u);if(!x.ok)throw Error("Data nejsou dostupná");return x.json()}
+async function load(){let q=$("city").value.trim();if(!q)return;$("go").disabled=true;$("status").textContent="Načítám předpovědi…";$("output").innerHTML="";
+try{localStorage.setItem("weatherCity",q);let g=await j("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(q)+"&count=1&language=cs&format=json");if(!g.results?.length)throw Error("Místo nebylo nalezeno.");let p=g.results[0],b="latitude="+p.latitude+"&longitude="+p.longitude+"&timezone="+encodeURIComponent(p.timezone||"Europe/Prague")+"&forecast_days=4&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max",ms=["ecmwf_ifs025","icon_seamless","gfs_seamless","meteofrance_seamless"],z=await Promise.allSettled(ms.map(m=>j("https://api.open-meteo.com/v1/forecast?"+b+"&models="+m))),ds=z.filter(x=>x.status==="fulfilled").map(x=>x.value);if(!ds.length)throw Error("Meteorologická data nejsou dostupná.");
+let rows=[],h="<div class='status'><b>"+p.name+"</b>"+(p.admin1?", "+p.admin1:"")+"</div>";ds[0].daily.time.slice(1,4).forEach((date,k)=>{let i=k+1,t=mean(ds.map(x=>x.daily.temperature_2m_max?.[i])),n=mean(ds.map(x=>x.daily.temperature_2m_min?.[i])),pr=mean(ds.map(x=>x.daily.precipitation_probability_max?.[i])),mm=mean(ds.map(x=>x.daily.precipitation_sum?.[i])),w=mean(ds.map(x=>x.daily.wind_speed_10m_max?.[i])),codes=ds.map(x=>x.daily.weather_code?.[i]).filter(Number.isFinite),c=codes[Math.floor(codes.length/2)]??3,d=W[c]||["🌡️","Proměnlivé počasí"];rows.push({t,n,pr});h+=`<div class="day"><div class="head"><b>${D(date)}</b><span class="temp">${r(t)} °C</span></div><div class="weather">${d[0]} <b>${d[1]}</b></div><div class="details">Minimum ${r(n)} °C · srážky ${r(pr)} % · úhrn ${mm==null?"—":mm.toFixed(1)} mm · vítr až ${r(w)} km/h</div></div>`});
+let at=mean(rows.map(x=>(x.t+x.n)/2)),rd=rows.filter(x=>x.pr>=50).length,rt=rd>=2?"s častějšími srážkami":rd===1?"místy se srážkami":"většinou bez výraznějších srážek";h+=`<div class="result"><b>Výsledek:</b> V následujících třech dnech bude v ${p.name} ${rt}, s průměrnou teplotou kolem ${r(at)} °C.</div>`;$("output").innerHTML=h;$("status").textContent="Předpověď aktualizována."}catch(e){$("status").textContent="Chyba: "+e.message}finally{$("go").disabled=false}}
+$("go").onclick=load;let s=localStorage.getItem("weatherCity");if(s)$("city").value=s;load();
+let dp;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;$("install").style.display="block"});$("install").onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;$("install").style.display="none"}};
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script></body></html>

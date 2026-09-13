@@ -1,0 +1,1 @@
+Nahraj všechny soubory do kořene GitHub repozitáře a nech GitHub Pages na main / root.
